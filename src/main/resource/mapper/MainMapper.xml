@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+
+<mapper namespace="xyh.mapper.MainMapper">
+
+    <!--void insertProject(Project project);-->
+    <insert id="insertProject" parameterType="xyh.bean.Project">
+        insert into project(
+          name,start_time
+        )values(
+          #{name },#{startTime}
+        )
+    </insert>
+
+    <!--void insertStudent(Student student);-->
+    <insert id="insertStudent" parameterType="xyh.bean.Student">
+        insert into student(
+          id,name,dept,gender,age,phone
+        )values (
+          #{id},#{name },#{dept},#{gender},#{age},#{phone}
+        )
+    </insert>
+
+    <!--void insertRel(Rel rel);-->
+    <insert id="insertRel" parameterType="xyh.bean.Rel">
+        insert into rel(
+          sid,pid,enroll_time
+        )values (
+          #{sid},#{pid},#{enrollTime}
+        )
+    </insert>
+
+    <!--Project selectProjectByName(String name);-->
+    <select id="selectProjectByName" resultType="xyh.bean.Project">
+        select
+          id,name,start_time startTime
+        from
+          project
+        where
+          name=#{name }
+    </select>
+
+    <!--Student selectStudentByName(String name);-->
+    <select id="selectStudentByName" resultType="xyh.bean.Student">
+        select
+          id,name,dept,gender,age,phone
+        from
+          student
+        where
+          name=#{name}
+    </select>
+
+    <!--Integer selectCountOneDay(Rel rel);-->
+    <select id="selectCountOneDay" parameterType="xyh.bean.Rel" resultType="java.lang.Integer">
+        select
+          count(*)
+        from
+          rel
+        where
+          to_days(enroll_time)=to_days(#{enrollTime})
+        and
+          pid=#{pid}
+    </select>
+
+    <!--List<Item> selectAll();-->
+    <select id="selectAll" resultType="xyh.bean.Item">
+        select
+          project_name projectName,
+          project_id projectId,
+          name,dept,gender,age,
+          start_time startTime,
+          enroll_time enrollTime,
+          phone
+        from
+          item
+    </select>
+
+    <!--List<Item> selectItemByName(String name);-->
+    <select id="selectItemByName" resultType="xyh.bean.Item">
+        select
+          project_name projectName,
+          project_id projectId,
+          name,dept,gender,age,
+          start_time startTime,
+          enroll_time enrollTime,
+          phone
+        from
+          item
+        where
+          project_name like concat("%",#{pname},"%")
+    </select>
+
+
+    <!--String[] selectMax();-->
+    <select id="selectMax" resultType="java.lang.String">
+        select
+          name
+        from
+          project
+        where
+          name in (
+            select project_name from item group by project_name having count(*) =(
+              select count(*) from item group by project_name desc limit 0,1
+            )
+          )
+    </select>
+
+
+    <!--String selectAvgAge();-->
+    <select id="selectAvgAge" resultType="java.lang.String">
+        select
+          avg(age)
+        from
+          student
+    </select>
+
+</mapper>
